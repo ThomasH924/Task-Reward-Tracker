@@ -108,28 +108,6 @@
       transition: width 0.3s ease;
     }
 
-    /* Game Section */
-    #game-section {
-      position: fixed;
-      right: 0;
-      top: 100px;
-      width: 200px;
-      background-color: #FDEDB2;
-      padding: 15px;
-      border-radius: 10px 0 0 10px;
-      text-align: center;
-    }
-
-    .game-button {
-      width: 80%;
-      margin: 10px auto;
-    }
-
-    #gameCanvas {
-      background: #000;
-      margin: 10px auto;
-    }
-
     /* Task List */
     #task-list {
       list-style-type: none;
@@ -163,9 +141,6 @@
         <button id="add-reward-btn">Add Custom Reward</button>
         <button id="reset-btn" class="danger">Reset All Progress</button>
       </section>
-      <section id="game-section">
-        <button id="play-game-btn" class="game-button">Play Game (2 coins)</button>
-        <canvas id="gameCanvas" style="display: none;" width="200" height="300"></canvas>
       </section>
     </main>
   </div>
@@ -344,66 +319,6 @@
         document.getElementById('main-app').style.display = 'block';
       }
 
-      const canvas = document.getElementById('gameCanvas');
-      const ctx = canvas.getContext('2d');
-      let gameInterval;
-      let paddle = { x: 85, width: 30, height: 10 };
-      let ball = { x: 100, y: 150, dx: 2, dy: -2, radius: 5 };
-      let gameActive = false;
-
-      function drawGame() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(paddle.x, canvas.height - 20, paddle.width, paddle.height);
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#fff';
-        ctx.fill();
-        ctx.closePath();
-        ball.x += ball.dx;
-        ball.y += ball.dy;
-        if(ball.x + ball.dx > canvas.width - ball.radius || ball.x + ball.dx < ball.radius) ball.dx = -ball.dx;
-        if(ball.y + ball.dy < ball.radius) ball.dy = -ball.dy;
-        if(ball.y + ball.dy > canvas.height - 20 - ball.radius) {
-          if(ball.x > paddle.x && ball.x < paddle.x + paddle.width) ball.dy = -ball.dy;
-          else if(ball.y + ball.dy > canvas.height - ball.radius) endGame();
-        }
-      }
-
-      function endGame() {
-        clearInterval(gameInterval);
-        gameActive = false;
-        canvas.style.display = 'none';
-        document.getElementById('play-game-btn').style.display = 'block';
-      }
-
-      function startGame() {
-        if(coins >= 2) {
-          coins -= 2;
-          document.getElementById('coin-count').textContent = coins;
-          saveUserData();
-          ball = { x: 100, y: 150, dx: 2, dy: -2, radius: 5 };
-          paddle = { x: 85, width: 30, height: 10 };
-          canvas.style.display = 'block';
-          document.getElementById('play-game-btn').style.display = 'none';
-          gameActive = true;
-          gameInterval = setInterval(drawGame, 10);
-          setTimeout(endGame, 180000);
-        } else {
-          alert('Not enough coins! You need 2 coins to play.');
-        }
-      }
-
-      canvas.addEventListener('mousemove', (e) => {
-        if(gameActive) {
-          const rect = canvas.getBoundingClientRect();
-          const mouseX = e.clientX - rect.left;
-          paddle.x = Math.min(Math.max(mouseX - paddle.width/2, 0), canvas.width - paddle.width);
-        }
-      });
-
-      document.getElementById('play-game-btn').addEventListener('click', startGame);
-    });
   </script>
 </body>
 </html>
