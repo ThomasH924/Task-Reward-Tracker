@@ -154,22 +154,7 @@
       <h1>Task & Reward Tracker</h1>
     </header>
 
-    <main>
-      <section id="task-history">
-        <h2>Task History</h2>
-        <div id="history-list"></div>
-      </section>
-      <section id="tasks">
-        <h2>Tasks</h2>
-        <input type="text" id="task-input" placeholder="New task...">
-        <select id="task-size">
-          <option value="small">Small</option>
-          <option value="medium">Medium</option>
-          <option value="big">Big</option>
-        </select>
-        <button id="add-task-btn">Add Task</button>
-        <ul id="task-list"></ul>
-      </section>
+    
 
       <section id="rewards">
         <h2>Rewards</h2>
@@ -191,7 +176,6 @@
     let tasks = [];
     let rewardList = [];
     let nickname = '';
-    let taskHistory = {};
 
     function loadUserData() {
       const data = localStorage.getItem('productivityData');
