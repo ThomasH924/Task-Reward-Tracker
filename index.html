@@ -1,177 +1,349 @@
-let healthPoints = 0;
-let coins = 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Productivity Tracker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #fff9e6;
+      margin: 0;
+      padding: 0;
+    }
+    #topBar {
+      background-color: #f7dc7b;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    #userInfo div {
+      color: #5e3c00;
+    }
+    #healthBarContainer {
+      background-color: #e0e0e0;
+      width: 200px;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    #healthBar {
+      background-color: #a67c00;
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .main {
+      display: flex;
+      padding: 20px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .column {
+      flex: 1;
+      min-width: 300px;
+    }
+    .section {
+      background-color: #fff3c4;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 5px 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .add-button {
+      background-color: #5e3c00;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #resetButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #5e3c00;
+      color: white;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-weight: bold;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff9e6;
+      border: 2px solid #5e3c00;
+      padding: 20px;
+      border-radius: 8px;
+      width: 400px;
+    }
+    .modal-content input,
+    .modal-content select {
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #aaa;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
 
-const healthList = [
-  { name: 'Drink Water', hp: 1 },
-  { name: 'Eat Breakfast', hp: 3 },
-  { name: 'Eat Lunch', hp: 3 },
-  { name: 'Eat Dinner', hp: 3 },
-  { name: 'Go Outside', hp: 3 },
-  { name: 'Exercise', hp: 4 },
-  { name: 'Shower', hp: 2 },
-  { name: 'Brush Teeth', hp: 1 }
-];
+  <div id="topBar">
+    <div id="userInfo">
+      <div>Nickname: <span id="userName">Robin</span></div>
+      <div>Health Points: <span id="healthPoints">0</span></div>
+      <div>Coins: <span id="coins">0</span></div>
+    </div>
+    <div id="healthBarContainer">
+      <div id="healthBar"></div>
+    </div>
+  </div>
 
-const rewardList = [
-  { name: '15 Min Screen-Free Break', cost: 10 },
-  { name: '25 Min Screen Break', cost: 15 },
-  { name: 'Lazy Evening', cost: 50 },
-  { name: 'Lazy Weekend', cost: 200 }
-];
-
-window.onload = function () {
-  renderHealthTasks();
-  renderRewards();
-};
-
-function updateDisplay() {
-  document.getElementById('healthPoints').textContent = healthPoints;
-  document.getElementById('coins').textContent = coins;
-  const bar = document.getElementById('healthBar');
-  bar.style.width = `${Math.min((healthPoints / 20) * 100, 100)}%`;
-}
-
-function renderHealthTasks() {
-  const container = document.getElementById('healthTasks');
-  container.innerHTML = '';
-  healthList.forEach(task => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <span>${task.name} (+${task.hp} HP)</span>
-      <button onclick="completeHealthTask(${task.hp})">Done</button>`;
-    container.appendChild(li);
-  });
-}
-
-function renderRewards() {
-  const container = document.getElementById('rewards');
-  container.innerHTML = '';
-  rewardList.forEach(reward => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <span>${reward.name}</span>
-      <button onclick="buyReward(${reward.cost})">${reward.cost}🪙</button>`;
-    container.appendChild(li);
-  });
-}
-
-function renderStudyTasks() {
-  const container = document.getElementById('studyTasks');
-  container.innerHTML = '';
-  const tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
-  tasks.forEach((task, index) => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <input type="checkbox" disabled />
-      <span>${task.name}</span>
-      <button onclick="unlockTask(${index})">${task.hpCost} HP</button>
-      <button onclick="completeStudyTask(${index})">${task.coins}🪙</button>`;
-    container.appendChild(li);
-  });
-}
-
-function completeHealthTask(hp) {
-  healthPoints += hp;
-  updateDisplay();
-}
-
-function buyReward(cost) {
-  if (coins >= cost) {
-    coins -= cost;
-    updateDisplay();
-  } else {
-    alert('Not enough coins!');
-  }
-}
-
-function unlockTask(index) {
-  const tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
-  if (healthPoints >= tasks[index].hpCost) {
-    healthPoints -= tasks[index].hpCost;
-    tasks[index].unlocked = true;
-    localStorage.setItem('studyTasks', JSON.stringify(tasks));
-    updateDisplay();
-    renderStudyTasks();
-  } else {
-    alert('Not enough HP!');
-  }
-}
-
-function completeStudyTask(index) {
-  const tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
-  if (tasks[index].unlocked) {
-    coins += tasks[index].coins;
-    tasks.splice(index, 1);
-    localStorage.setItem('studyTasks', JSON.stringify(tasks));
-    updateDisplay();
-    renderStudyTasks();
-  }
-}
-
-function showPopup(title, callback, withDifficulty = false) {
-  const container = document.getElementById('popupContainer');
-  container.innerHTML = `
-    <div class="modal">
-      <div class="modal-content">
-        <h2>${title}</h2>
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <input type="text" id="popupInput" placeholder="Name" />
-          ${withDifficulty ? `
-            <select id="difficultySelect">
-              <option value="easy">Small (2 coins / 2 HP)</option>
-              <option value="medium">Medium (4 coins / 5 HP)</option>
-              <option value="hard">Big (6 coins / 10 HP)</option>
-            </select>` : ''
-          }
-          <button onclick="submitPopup(${callback.name}, ${withDifficulty})">Add</button>
-          <button onclick="closePopup()">Cancel</button>
+  <div class="main">
+    <div class="column">
+      <div class="section">
+        <div class="section-header">
+          <h3>Health Tasks</h3>
+          <button class="add-button" onclick="showPopup('Add Health Task', addHealthTask)">+</button>
         </div>
+        <ul id="healthTasks"></ul>
       </div>
     </div>
-  `;
-}
 
-function closePopup() {
-  document.getElementById('popupContainer').innerHTML = '';
-}
+    <div class="column">
+      <div class="section">
+        <div class="section-header">
+          <h3>Study Tasks</h3>
+          <button class="add-button" onclick="showPopup('Add Study Task', addStudyTask, true)">+</button>
+        </div>
+        <ul id="studyTasks"></ul>
+      </div>
 
-function submitPopup(callbackName, withDifficulty) {
-  const name = document.getElementById('popupInput').value;
-  if (!name.trim()) return;
+      <div class="section">
+        <div class="section-header">
+          <h3>Rewards</h3>
+          <button class="add-button" onclick="showPopup('Add Reward', addReward, true)">+</button>
+        </div>
+        <ul id="rewards"></ul>
+      </div>
+    </div>
+  </div>
 
-  if (withDifficulty) {
-    const difficulty = document.getElementById('difficultySelect').value;
-    const hpCost = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 5 : 10;
-    const coins = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 4 : 6;
-    callbackName({ name, hpCost, coins, unlocked: false });
-  } else {
-    callbackName({ name, hp: 1 });
-  }
+  <button id="resetButton" onclick="resetData()">Reset</button>
+  <div id="popupContainer"></div>
 
-  closePopup();
-}
+  <script>
+    let healthPoints = 0;
+    let coins = 0;
 
-function addHealthTask(task) {
-  healthList.push(task);
-  renderHealthTasks();
-}
+    const healthList = [
+      { name: 'Drink Water', hp: 1 },
+      { name: 'Eat Breakfast', hp: 3 },
+      { name: 'Eat Lunch', hp: 3 },
+      { name: 'Eat Dinner', hp: 3 },
+      { name: 'Go Outside', hp: 3 },
+      { name: 'Exercise', hp: 4 },
+      { name: 'Shower', hp: 2 },
+      { name: 'Brush Teeth', hp: 1 }
+    ];
 
-function addStudyTask(task) {
-  const tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
-  tasks.push(task);
-  localStorage.setItem('studyTasks', JSON.stringify(tasks));
-  renderStudyTasks();
-}
+    const rewardList = [
+      { name: '15 Min Screen-Free Break', cost: 10 },
+      { name: '25 Min Screen Break', cost: 15 },
+      { name: 'Lazy Evening', cost: 50 },
+      { name: 'Lazy Weekend', cost: 200 }
+    ];
 
-function addReward(reward) {
-  rewardList.push({ name: reward.name, cost: reward.coins });
-  renderRewards();
-}
+    window.onload = function () {
+      renderHealthTasks();
+      renderRewards();
+      renderStudyTasks();
+    };
 
-function resetData() {
-  healthPoints = 0;
-  coins = 0;
-  localStorage.removeItem('studyTasks');
-  updateDisplay();
-  renderStudyTasks();
-}
+    function updateDisplay() {
+      document.getElementById('healthPoints').textContent = healthPoints;
+      document.getElementById('coins').textContent = coins;
+      document.getElementById('healthBar').style.width = Math.min((healthPoints / 20) * 100, 100) + '%';
+    }
+
+    function renderHealthTasks() {
+      const container = document.getElementById('healthTasks');
+      container.innerHTML = '';
+      healthList.forEach(task => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${task.name} (+${task.hp} HP)</span>
+                        <button onclick="completeHealthTask(${task.hp})">Done</button>`;
+        container.appendChild(li);
+      });
+    }
+
+    function renderRewards() {
+      const container = document.getElementById('rewards');
+      container.innerHTML = '';
+      rewardList.forEach(reward => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${reward.name}</span>
+                        <button onclick="buyReward(${reward.cost})">${reward.cost}🪙</button>`;
+        container.appendChild(li);
+      });
+    }
+
+    function renderStudyTasks() {
+      const container = document.getElementById('studyTasks');
+      container.innerHTML = '';
+      const tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <input type="checkbox" disabled />
+          <span>${task.name}</span>
+          <button onclick="unlockTask(${index})">${task.hpCost} HP</button>
+          <button onclick="completeStudyTask(${index})">${task.coins}🪙</button>`;
+        container.appendChild(li);
+      });
+    }
+
+    function completeHealthTask(hp) {
+      healthPoints += hp;
+      updateDisplay();
+    }
+
+    function buyReward(cost) {
+      if (coins >= cost) {
+        coins -= cost;
+        updateDisplay();
+      } else {
+        alert('Not enough coins!');
+      }
+    }
+
+    function unlockTask(index) {
+      const tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
+      if (healthPoints >= tasks[index].hpCost) {
+        healthPoints -= tasks[index].hpCost;
+        tasks[index].unlocked = true;
+        localStorage.setItem('studyTasks', JSON.stringify(tasks));
+        updateDisplay();
+        renderStudyTasks();
+      } else {
+        alert('Not enough HP!');
+      }
+    }
+
+    function completeStudyTask(index) {
+      const tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
+      if (tasks[index].unlocked) {
+        coins += tasks[index].coins;
+        tasks.splice(index, 1);
+        localStorage.setItem('studyTasks', JSON.stringify(tasks));
+        updateDisplay();
+        renderStudyTasks();
+      }
+    }
+
+    function showPopup(title, callback, withDifficulty = false) {
+      const container = document.getElementById('popupContainer');
+      container.innerHTML = `
+        <div class="modal">
+          <div class="modal-content">
+            <h2>${title}</h2>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <input type="text" id="popupInput" placeholder="Name" />
+              ${withDifficulty ? `
+                <select id="difficultySelect">
+                  <option value="easy">Small (2 coins / 2 HP)</option>
+                  <option value="medium">Medium (4 coins / 5 HP)</option>
+                  <option value="hard">Big (6 coins / 10 HP)</option>
+                </select>` : ''
+              }
+              <button onclick="submitPopup(${callback.name}, ${withDifficulty})">Add</button>
+              <button onclick="closePopup()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function closePopup() {
+      document.getElementById('popupContainer').innerHTML = '';
+    }
+
+    function submitPopup(callbackName, withDifficulty) {
+      const name = document.getElementById('popupInput').value;
+      if (!name.trim()) return;
+
+      if (withDifficulty) {
+        const difficulty = document.getElementById('difficultySelect').value;
+        const hpCost = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 5 : 10;
+        const coins = difficulty === 'easy' ? 2 : difficulty === 'medium' ? 4 : 6;
+        callbackName({ name, hpCost, coins, unlocked: false });
+      } else {
+        callbackName({ name, hp: 1 });
+      }
+
+      closePopup();
+    }
+
+    function addHealthTask(task) {
+      healthList.push(task);
+      renderHealthTasks();
+    }
+
+    function addStudyTask(task) {
+      const tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
+      tasks.push(task);
+      localStorage.setItem('studyTasks', JSON.stringify(tasks));
+      renderStudyTasks();
+    }
+
+    function addReward(reward) {
+      rewardList.push({ name: reward.name, cost: reward.coins });
+      renderRewards();
+    }
+
+    function resetData() {
+      healthPoints = 0;
+      coins = 0;
+      localStorage.removeItem('studyTasks');
+      updateDisplay();
+      renderStudyTasks();
+    }
+  </script>
+
+</body>
+</html>
